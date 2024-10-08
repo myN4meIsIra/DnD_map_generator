@@ -7,7 +7,8 @@ from loggingAndOutput import Logging
 Logging = Logging(False)
 
 from statics import materials
-
+from statics import chanceOfDecoration
+from statics import decorationWeights
 class Creation:
     def __init__(self):
         self.blockSize = None
@@ -132,23 +133,56 @@ class Creation:
         return block
 
     # create a plant
-    def plant(self, type):
+    def decoration(self, type, decorationSize, backgroundColor):
         # generate a new image for this block
-        plantWidth, plantHeight = round(self.blockSize/4), round(self.blockSize/4)
-        blockImg = Image.new("RGB", (plantWidth, plantHeight), "black")  # Create a new black image
+        decorationWidth, decorationHeight = round(decorationSize), round(decorationSize)
+        blockImg = Image.new("RGB", (decorationWidth, decorationHeight), "black")  # Create a new black image
         block = blockImg.load()  # Create the pixel map
 
-        # populate this new block
-        for i in range(plantWidth):
-            for j in range(plantHeight):
-                # import the RGB data for the selected material (this is randomized with narrow area)
-                RGB = self.fuzzMaterialRGB('plant')
+        # on the fly calculate the weights for generating different types of decorations
+        decorWeights = []
+        decors = []
+        for decor in decorationWeights:
+            Logging.log(f'decor = {decor}, value = {decorationWeights[decor]}', '\n')
+            decors.append(decor)
+            decorWeights.append(decorationWeights[decor])
+        decoration = random.choices(decors, weights=decorWeights)[0]
+        Logging.log(f'decoration is... {decoration}','\n')
 
-                # create borders of block
-                if i == self.blockSize - 1 or j == self.blockSize - 1 or i == 0 or j == 0:
-                    RGB = [abs(RGB[0] - 10), abs(RGB[1] - 10), abs(RGB[2] - 10)]
+        if decoration == 'plant':
+            # populate this new block
+            for x in range(decorationWidth):
+                for y in range(decorationHeight):
+                    # import the RGB data for the selected material (this is randomized with narrow area)
+                    RGB = self.fuzzMaterialRGB('plant')
 
-                block[i, j] = (RGB[0], RGB[1], RGB[2])
+                    # (x-h)2 + (y-k)2 = r2
+                    if ((x - round(decorationSize / 2)) ** 2 + (y - round(decorationSize / 2)) ** 2) <= round(
+                            decorationSize / 2) ** 2:
+                        block[x, y] = (RGB[0]+10, RGB[1]+10, RGB[2]+10)
+                    else:
+                        backgroundColorRGB = self.fuzzMaterialRGB(backgroundColor)
+                        block[x, y] = (backgroundColorRGB[0], backgroundColorRGB[1], backgroundColorRGB[2])
+
+        if decoration == 'chest':
+            chestHeight = round(3 * decorationHeight / 4)
+            stoneColor = materials['stone']
+            # populate this new block
+            for x in range(decorationWidth):
+                for y in range(decorationHeight):
+                    # import the RGB data for the selected material (this is randomized with narrow area)
+                    RGB = self.fuzzMaterialRGB('chest')
+
+                    if (y < chestHeight ):
+                        block[x, y] = (RGB[0] + 10, RGB[1] + 10, RGB[2] + 10)
+                    else:
+                        backgroundColorRGB = self.fuzzMaterialRGB(backgroundColor)
+                        block[x, y] = (backgroundColorRGB[0], backgroundColorRGB[1], backgroundColorRGB[2])
+                    if(y<chestHeight+round(2 * decorationHeight / 10)
+                            and y>chestHeight-round(2 * decorationHeight / 10)
+                            and x<round((decorationHeight/2) + (2 * decorationHeight / 10))
+                            and x>round((decorationHeight/2) - (2 * decorationHeight / 10)) ):
+                        block[x,y] = (stoneColor[0], stoneColor[1], stoneColor[2])
 
         return block
 
@@ -204,6 +238,13 @@ class Creation:
                     RGB = [abs(RGB[0] - 10), abs(RGB[1] - 10), abs(RGB[2] - 10)]
                     block[x, y] = (RGB[0], RGB[1], RGB[2])
 
+        if random.choices([1,0],cum_weights=[chanceOfDecoration, 1-chanceOfDecoration],k=1)[0]:
+            decorationSize = round(self.blockSize/4)
+            decorationX,decorationY = random.randint(0,self.blockSize-decorationSize), random.randint(0,self.blockSize-decorationSize)
+            decorationBlock = self.decoration('',decorationSize, floorType)
+            for x in range(decorationSize):
+                for y in range(decorationSize):
+                    block[decorationX+x,decorationY+y] = decorationBlock[x,y]
 
         return block
 

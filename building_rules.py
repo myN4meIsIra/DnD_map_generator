@@ -87,7 +87,7 @@ rules = {
             {'floor': ''},
             {'-wall': 'v'},
             {'-door': 'v'},
-            {'-wall': 'c'},
+            #{'wall': 'c'},
         ],
         'tree-':[
             {'tree':''},
@@ -97,7 +97,7 @@ rules = {
             {'floor': ''},
             {'-wall': 'v'},
             {'-door': 'v'},
-            {'-wall': 'c'},
+            #{'wall': 'c'},
         ],
 
 
@@ -172,7 +172,7 @@ rules = {
             {'floor': ''},
             {'-wall': 'h'},
             {'-door': 'h'},
-            {'-wall': 'c'},
+            #{'wall': 'c'},
         ],
         'tree-':[
             {'tree':''},
@@ -181,7 +181,7 @@ rules = {
             {'floor':''},
             {'-wall': 'h'},
             {'-door': 'h'},
-            {'-wall': 'c'},
+            #{'wall': 'c'},
         ],
     },
 

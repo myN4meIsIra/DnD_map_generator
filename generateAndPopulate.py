@@ -11,6 +11,53 @@ from statics import weights
 
 class GenerateAndPopulate():
 
+    # apply rules from building_rules.py to remove unallowed elements from being built
+    def disallowRules(self, possibleNextElements):
+
+        # disallow rules
+        verticalPresent = False
+        horizontalPresent = False
+        itemsToRemove = []
+        for l in possibleNextElements:
+
+            # add items from "remove" list from building rules to a "remove" list
+            if '-' in str(list(l.keys())[0]) or str(list(l.keys())[0])[0] == '-':
+                itemToRemoveDict = {list(l.keys())[0].strip('-'): list(l.values())[0]}
+                itemsToRemove.append(itemToRemoveDict)
+                possibleNextElements.remove(l)
+                # possibleNextElements.remove({list(l.keys())[0] : list(l.values())[0]})
+
+            # if there is a vertical wall above or below and a horizontal wall left or right, force a corner wall
+            if list(l.keys())[0] == 'h':
+                horizontalPresent = True
+            if list(l.keys())[0] == 'v':
+                verticalPresent = True
+            if (horizontalPresent and verticalPresent):
+                Logging.log('there be walls here', '\n')
+
+                possibleNextElements.remove({'wall': 'h'})
+                possibleNextElements.remove({'wall': 'v'})
+
+            Logging.log(f'start-- possible: {possibleNextElements}', '\n')
+            Logging.log(f"and to remove: {itemsToRemove}", '\n')
+            for j in possibleNextElements:
+                Logging.log(f'checking {j}', '\n')
+                # remove elements in the remove list
+                if j in itemsToRemove:
+                    itemToRemoveDict = j  # { list(j.keys())[0].strip('-') : list(j.values())[0] }
+                    Logging.log(f'removing {j} --> {itemToRemoveDict}', '\n')
+                    possibleNextElements.remove(itemToRemoveDict)
+
+                # make sure the remove list indicator is removed from the possible list
+                if '-' in list(j.keys())[0]:
+                    Logging.log(f'removing for \'-\' {j} ', '\n')
+                    possibleNextElements.remove(j)
+
+            Logging.log(f'possible: {possibleNextElements}', '\n')
+            Logging.log(f"and to remove: {itemsToRemove} -- end", '\n')
+
+        return possibleNextElements
+
     def procedural_generation(self, Creation, img, pixels, generationIterations, material):
 
         # matrix of types of elements
@@ -95,47 +142,8 @@ class GenerateAndPopulate():
                         # just for a starter... thing
                         possibleNextElements = [{'floor': ""}, {'tree': ""},]
 
-
-                    # disallow rules
-                    verticalPresent = False
-                    horizontalPresent = False
-                    itemsToRemove = []
-                    for l in possibleNextElements:
-
-                        # add items from "remove" list from building rules to a "remove" list
-                        if '-' in str(list(l.keys())[0]) or str(list(l.keys())[0])[0] == '-':
-                            itemToRemoveDict = { list(l.keys())[0].strip('-') : list(l.values())[0] }
-                            itemsToRemove.append(itemToRemoveDict)
-                            possibleNextElements.remove(l)
-                            #possibleNextElements.remove({list(l.keys())[0] : list(l.values())[0]})
-
-                        # if there is a vertical wall above or below and a horizontal wall left or right, force a corner wall
-                        if list(l.keys())[0] == 'h':
-                            horizontalPresent = True
-                        if list(l.keys())[0] == 'v':
-                            verticalPresent = True
-                        if (horizontalPresent and verticalPresent):
-                            Logging.log('there be walls here', '\n')
-
-                            possibleNextElements.remove({'wall': 'h'})
-                            possibleNextElements.remove({'wall': 'v'})
-                            break
-
-                        Logging.log(f'start-- possible: {possibleNextElements}','\n')
-                        Logging.log(f"and to remove: {itemsToRemove}", '\n')
-                        for j in possibleNextElements:
-                            Logging.log(f'checking {j}', '\n')
-                            if j in itemsToRemove:
-                                itemToRemoveDict = j#{ list(j.keys())[0].strip('-') : list(j.values())[0] }
-                                Logging.log(f'removing {j} --> {itemToRemoveDict}', '\n')
-                                possibleNextElements.remove( itemToRemoveDict)
-                            # indicator of presence in remove list
-                            if '-' in list(j.keys())[0]:
-                                Logging.log(f'removing for \'-\' {j} ', '\n')
-                                possibleNextElements.remove(j)
-
-                        Logging.log(f'possible: {possibleNextElements}', '\n')
-                        Logging.log(f"and to remove: {itemsToRemove} -- end", '\n')
+                    # remove unallowed things
+                    possibleNextElements = self.disallowRules(possibleNextElements)
 
                     #Logging.log(f"the list of possible next elements: {possibleNextElements}", '\n')
 
@@ -179,8 +187,7 @@ class GenerateAndPopulate():
 
         # translate blockMatrix into image
         for blockX in range(Creation.blocksWidth):
-            if Creation.blocksHeight > 90 or Creation.blocksWidth > 90:
-                Logging.say(f"row {blockX} of {Creation.blocksWidth}")
+            Logging.say(f"row {blockX+1} of {Creation.blocksWidth}")
 
             Logging.log("", '\n')
             for blockY in range(Creation.blocksHeight):
