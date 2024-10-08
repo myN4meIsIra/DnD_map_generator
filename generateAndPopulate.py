@@ -167,12 +167,14 @@ class GenerateAndPopulate():
                     element.new(elementType, material, orientation)
 
                     # make borders continuous
+                    """
                     if blockX in list([Creation.blocksWidth-1, 0]):
                         element.new('wall', material, 'v')
                     if blockY in list([Creation.blocksHeight-1, 0]):
                         element.new('wall', material, 'h')
                     if blockX in list([Creation.blocksWidth-1, 0]) and blockY in list([Creation.blocksHeight-1, 0]):
                         element.new('wall', material, 'c')
+                    """
 
 
                     Logging.log(f"[{blockX},{blockY}, {elementType}]", '')
