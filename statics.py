@@ -25,7 +25,7 @@ weights = {
     "floor": round((6 / 2) * 10),
 }
 
-chanceOfDecoration = 1/4
+chanceOfDecoration = 1/10
 decorationWeights = {
     'plant':5,
     'chest':1,

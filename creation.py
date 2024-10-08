@@ -29,6 +29,7 @@ class Creation:
 
         return materialRGB_randomized
 
+
     # draw a wall
     def wall(self, floorType, orientation):
         # generate a new image for this block
@@ -92,6 +93,9 @@ class Creation:
 
                     block[x, y] = (RGB[0], RGB[1], RGB[2])
 
+        # add decoration... maybe
+        block = self.decoration('', floorType, block)
+
         return block
 
     # generate an area that is filled in
@@ -133,11 +137,20 @@ class Creation:
         return block
 
     # create a plant
-    def decoration(self, type, decorationSize, backgroundColor):
+    def decoration(self, type, backgroundColor, block):
+
+        # probability and implementation for decoration
+        if not random.choices([1, 0], cum_weights=[chanceOfDecoration, 1 - chanceOfDecoration], k=1)[0]:
+            return block
+
+        decorationSize = round(self.blockSize / 4)
+        decorationX, decorationY = random.randint(0, self.blockSize - decorationSize-1), random.randint(0, self.blockSize - decorationSize-1)
+
+
         # generate a new image for this block
         decorationWidth, decorationHeight = round(decorationSize), round(decorationSize)
         blockImg = Image.new("RGB", (decorationWidth, decorationHeight), "black")  # Create a new black image
-        block = blockImg.load()  # Create the pixel map
+        decorationBlock = blockImg.load()  # Create the pixel map
 
         # on the fly calculate the weights for generating different types of decorations
         decorWeights = []
@@ -159,10 +172,10 @@ class Creation:
                     # (x-h)2 + (y-k)2 = r2
                     if ((x - round(decorationSize / 2)) ** 2 + (y - round(decorationSize / 2)) ** 2) <= round(
                             decorationSize / 2) ** 2:
-                        block[x, y] = (RGB[0]+10, RGB[1]+10, RGB[2]+10)
+                        decorationBlock[x, y] = (RGB[0]+10, RGB[1]+10, RGB[2]+10)
                     else:
                         backgroundColorRGB = self.fuzzMaterialRGB(backgroundColor)
-                        block[x, y] = (backgroundColorRGB[0], backgroundColorRGB[1], backgroundColorRGB[2])
+                        decorationBlock[x, y] = (backgroundColorRGB[0], backgroundColorRGB[1], backgroundColorRGB[2])
 
         if decoration == 'chest':
             chestHeight = round(3 * decorationHeight / 4)
@@ -174,15 +187,19 @@ class Creation:
                     RGB = self.fuzzMaterialRGB('chest')
 
                     if (y < chestHeight ):
-                        block[x, y] = (RGB[0] + 10, RGB[1] + 10, RGB[2] + 10)
+                        decorationBlock[x, y] = (RGB[0] + 10, RGB[1] + 10, RGB[2] + 10)
                     else:
                         backgroundColorRGB = self.fuzzMaterialRGB(backgroundColor)
-                        block[x, y] = (backgroundColorRGB[0], backgroundColorRGB[1], backgroundColorRGB[2])
+                        decorationBlock[x, y] = (backgroundColorRGB[0], backgroundColorRGB[1], backgroundColorRGB[2])
                     if(y<chestHeight+round(2 * decorationHeight / 10)
                             and y>chestHeight-round(2 * decorationHeight / 10)
                             and x<round((decorationHeight/2) + (2 * decorationHeight / 10))
                             and x>round((decorationHeight/2) - (2 * decorationHeight / 10)) ):
-                        block[x,y] = (stoneColor[0], stoneColor[1], stoneColor[2])
+                        decorationBlock[x,y] = (stoneColor[0], stoneColor[1], stoneColor[2])
+
+        for x in range(decorationSize):
+            for y in range(decorationSize):
+                block[decorationX + x, decorationY + y] = decorationBlock[x, y]
 
         return block
 
@@ -218,6 +235,7 @@ class Creation:
                     block[x, y] = (RGB[0], RGB[1], RGB[2])
 
 
+        # logic for vertical orientation
         if orientation == 'v':
             #wall
             for y in list(range(round(2 * self.blockSize / 5))) + \
@@ -238,13 +256,8 @@ class Creation:
                     RGB = [abs(RGB[0] - 10), abs(RGB[1] - 10), abs(RGB[2] - 10)]
                     block[x, y] = (RGB[0], RGB[1], RGB[2])
 
-        if random.choices([1,0],cum_weights=[chanceOfDecoration, 1-chanceOfDecoration],k=1)[0]:
-            decorationSize = round(self.blockSize/4)
-            decorationX,decorationY = random.randint(0,self.blockSize-decorationSize), random.randint(0,self.blockSize-decorationSize)
-            decorationBlock = self.decoration('',decorationSize, floorType)
-            for x in range(decorationSize):
-                for y in range(decorationSize):
-                    block[decorationX+x,decorationY+y] = decorationBlock[x,y]
+        # add decoration... maybe
+        block = self.decoration('', floorType, block)
 
         return block
 
@@ -283,4 +296,5 @@ class Creation:
 
     # after a bit of consideration... a floor is just a wood-filled area
     def floor(self, type):
-        return self.fill(type)
+        block = self.fill(type)
+        return block
