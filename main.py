@@ -31,8 +31,7 @@ def imageInfo(newCreation):
         generationIterations = int(input('please enter the number of map-cycle iterations'))
         material =          input(f"please enter the material wanted from \x1b[3m \033[1;33;48m{materialOptions}\033[0m")
         pixelsPerBlock =    int(input('please enter the number of pixels per 5x5 block'))
-        #imgHeight =     int(input("please enter image height"))
-        #imgWidth =      int(input("please enter image width"))
+
     except Exception as e:
         imgName = "map"
         blocksWidth = 120
