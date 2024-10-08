@@ -92,13 +92,24 @@ class GenerateAndPopulate():
                             possibleNextElements.append(type)
                         '''
                     else:
-                        possibleNextElements = [{'wall': 'h'}, {'floor': ""}, {'tree': ""}, {'door': 'h'}]
+                        # just for a starter... thing
+                        possibleNextElements = [{'floor': ""}, {'tree': ""},]
 
-                    # if there is a vertical wall above or below and a horizontal wall left or right, force a corner wall
+
+                    # disallow rules
                     verticalPresent = False
                     horizontalPresent = False
+                    itemsToRemove = []
                     for l in possibleNextElements:
-                        # print(f'l is {l}')
+
+                        # add items from "remove" list from building rules to a "remove" list
+                        if '-' in str(list(l.keys())[0]) or str(list(l.keys())[0])[0] == '-':
+                            itemToRemoveDict = { list(l.keys())[0].strip('-') : list(l.values())[0] }
+                            itemsToRemove.append(itemToRemoveDict)
+                            possibleNextElements.remove(l)
+                            #possibleNextElements.remove({list(l.keys())[0] : list(l.values())[0]})
+
+                        # if there is a vertical wall above or below and a horizontal wall left or right, force a corner wall
                         if list(l.keys())[0] == 'h':
                             horizontalPresent = True
                         if list(l.keys())[0] == 'v':
@@ -109,6 +120,22 @@ class GenerateAndPopulate():
                             possibleNextElements.remove({'wall': 'h'})
                             possibleNextElements.remove({'wall': 'v'})
                             break
+
+                        Logging.log(f'start-- possible: {possibleNextElements}','\n')
+                        Logging.log(f"and to remove: {itemsToRemove}", '\n')
+                        for j in possibleNextElements:
+                            Logging.log(f'checking {j}', '\n')
+                            if j in itemsToRemove:
+                                itemToRemoveDict = j#{ list(j.keys())[0].strip('-') : list(j.values())[0] }
+                                Logging.log(f'removing {j} --> {itemToRemoveDict}', '\n')
+                                possibleNextElements.remove( itemToRemoveDict)
+                            # indicator of presence in remove list
+                            if '-' in list(j.keys())[0]:
+                                Logging.log(f'removing for \'-\' {j} ', '\n')
+                                possibleNextElements.remove(j)
+
+                        Logging.log(f'possible: {possibleNextElements}', '\n')
+                        Logging.log(f"and to remove: {itemsToRemove} -- end", '\n')
 
                     #Logging.log(f"the list of possible next elements: {possibleNextElements}", '\n')
 
@@ -130,10 +157,15 @@ class GenerateAndPopulate():
 
                     element = Element()
                     element.new(elementType, material, orientation)
+
+                    # make borders continuous
                     if blockX in list([Creation.blocksWidth-1, 0]):
                         element.new('wall', material, 'v')
                     if blockY in list([Creation.blocksHeight-1, 0]):
                         element.new('wall', material, 'h')
+                    if blockX in list([Creation.blocksWidth-1, 0]) and blockY in list([Creation.blocksHeight-1, 0]):
+                        element.new('wall', material, 'c')
+
 
                     Logging.log(f"[{blockX},{blockY}, {elementType}]", '')
                     blockMatrix[blockX][blockY] = element

@@ -9,6 +9,8 @@
         ]
     }
 
+    elements of the format {-<element>:<orientation>} with '-' in the key position, are removed from possible build options in the selected orientation
+
                             ceiling
                               |
                       left -- 0 -- right
@@ -23,16 +25,24 @@ rules = {
             {'wall':'v'},
             {'door':'v'},
             {'wall':'c'},
+            {'-floor':''},
+            {'-wall':'h'},
+            {'-door':'h'},
         ],
         "wall-v":[
             {'wall':'v'},
             {'door':'v'},
             {'wall': 'c'},
+            {'-floor':''},
+            {'-wall': 'h'},
+            {'-door': 'h'},
         ],
         "wall-h":[
             {'floor':''},
             {'tree':''},
             {'wall': 'c'},
+            {'-wall': 'v'},
+            {'-door': 'v'},
         ],
 
         # doors
@@ -41,11 +51,16 @@ rules = {
             {'floor':''},
             {'floor': ''},
             {'tree':''},
+            {'-wall': 'v'},
+            {'-door': 'v'},
         ],
         'door-v':[
             {'wall':'v'},
             {"wall": 'c'},
-            {'door':'v'}
+            {'door':'v'},
+            {'-wall': 'h'},
+            {'-door': 'h'},
+            {'-floor':''}
         ],
 
         # roads
@@ -54,6 +69,7 @@ rules = {
             {'road':'v'},
             {'road':'c'},
             {'floor':''},
+
         ],
         'road-h':[
             {"wall":'h'},
@@ -66,20 +82,22 @@ rules = {
         'floor-':[
             {'wall':'h'},
             {'door':'h'},
-            {'wall': 'v'},
-            {'door': 'v'},
             {'wall': 'c'},
             {'tree':''},
             {'floor': ''},
+            {'-wall': 'v'},
+            {'-door': 'v'},
+            {'-wall': 'c'},
         ],
         'tree-':[
             {'tree':''},
             {'wall': 'h'},
             {'door': 'h'},
-            {'wall': 'v'},
-            {'door': 'v'},
             {'wall': 'c'},
             {'floor': ''},
+            {'-wall': 'v'},
+            {'-door': 'v'},
+            {'-wall': 'c'},
         ],
 
 
@@ -94,16 +112,24 @@ rules = {
             {'wall':'h'},
             {'door':'h'},
             {'wall':'c'},
+            {'-floor': ''},
+            {'-wall': 'v'},
+            {'-door': 'v'},
         ],
         "wall-v":[
             {'floor':''},
             {'tree':''},
             {'wall': 'c'},
+            {'-floor': ''},
+            {'-wall': 'v'},
+            {'-door': 'v'},
         ],
         "wall-h":[
             {'wall':'v'},
             {'door':'v'},
             {'wall': 'c'},
+            {'-wall': 'v'},
+            {'-door': 'v'},
         ],
 
 
@@ -111,12 +137,17 @@ rules = {
         'door-h':[
             {'wall':'v'},
             {"wall": 'c'},
-            {'door':'v'}
+            {'door':'v'},
+            {'-wall': 'v'},
+            {'-door': 'v'},
+            {'-floor':''},
         ],
         'door-v': [
             {'wall': 'h'},
             {'floor': ''},
             {'tree': ''},
+            {'-wall': 'h'},
+            {'-door': 'h'},
         ],
 
         # roads
@@ -135,22 +166,22 @@ rules = {
 
         # un-oriented elements
         'floor-':[
-            {'wall':'h'},
-            {'door':'h'},
             {'wall': 'v'},
             {'door': 'v'},
-            {'wall': 'c'},
             {'tree':''},
             {'floor': ''},
+            {'-wall': 'h'},
+            {'-door': 'h'},
+            {'-wall': 'c'},
         ],
         'tree-':[
             {'tree':''},
-            {'wall': 'h'},
-            {'door': 'h'},
             {'wall': 'v'},
             {'door': 'v'},
-            {'wall': 'c'},
             {'floor':''},
+            {'-wall': 'h'},
+            {'-door': 'h'},
+            {'-wall': 'c'},
         ],
     },
 

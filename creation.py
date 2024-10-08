@@ -242,4 +242,4 @@ class Creation:
 
     # after a bit of consideration... a floor is just a wood-filled area
     def floor(self, type):
-        return self.fill('wood')
+        return self.fill(type)
