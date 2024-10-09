@@ -5,10 +5,7 @@
 
 from PIL import Image
 import time
-import random
 
-from element import Element
-from building_rules import rules
 from loggingAndOutput import Logging
 from generateAndPopulate import GenerateAndPopulate
 Logging = Logging(False)
@@ -26,11 +23,12 @@ def imageInfo(newCreation):
 
     try:
         imgName =       "mapX" #input("please enter image name")
-        blocksHeight =  int(input("please enter the number of 5x5 blocks tall"))
-        blocksWidth =   int(input("please enter the number of 5x5 blocks wide"))
-        generationIterations = int(input('please enter the number of map-cycle iterations'))
+        blocksHeight =  int(input("please enter the number of 5x5 blocks tall (less than 20 is recommended for performance)"))
+        blocksWidth =   int(input("please enter the number of 5x5 blocks wide (less than 20 is recommended for performance)"))
+        generationIterations = int(input('please enter the number of map-cycle iterations (1-3 is plenty)'))
         material =          input(f"please enter the material wanted from \x1b[3m \033[1;33;48m{materialOptions}\033[0m")
         pixelsPerBlock =    int(input('please enter the number of pixels per 5x5 block'))
+        continuousBorders = bool(input('would you like the borders to be continuous?\x1b[3m \033[1;33;48m["True", "False"]\033[0m)'))
 
     except Exception as e:
         imgName = "map"
@@ -38,18 +36,28 @@ def imageInfo(newCreation):
         blocksHeight = 90
         generationIterations = 2
         pixelsPerBlock = 50
+        continuousBorders = True
         material = 'wood'
         Logging.error(f"improper input given. Defaulting to:\n "
                       f"{blocksWidth} blocks wide\n "
                       f"{blocksHeight} blocks tall\n "
-                      f"{generationIterations} iterations \n"
+                      f"{generationIterations} iterations run for map generation \n"
                       f"{material} material \n"
                       f"{pixelsPerBlock} pixels per plock \n"
+                      f"{continuousBorders} continuous borders \n"
                       f"exception thrown: {e}")
 
 
     imgHeight = blocksHeight*pixelsPerBlock
     imgWidth = blocksWidth*pixelsPerBlock
+
+    Logging.say(f"Configuration for map:\n"
+                f" number of blocks wide: {blocksWidth} \n "
+                f" number of blocks tall: {blocksHeight} \n "
+                f" number of iterations run for map generation: {generationIterations}  \n"
+                f" background material for the map: {material}  \n"
+                f" number of pixels per plock: {pixelsPerBlock}  \n"
+                f" continuous borders: {continuousBorders}  \n")
 
     newCreation.blockSize = min(round(imgHeight/blocksHeight), round(imgWidth/blocksWidth) )
     newCreation.blocksHeight = blocksHeight
@@ -59,6 +67,7 @@ def imageInfo(newCreation):
     newCreation.imgHeight = imgHeight
     newCreation.generationIterations = generationIterations
     newCreation.material = material
+    newCreation.continuousBorders = continuousBorders
 
     return 1
 

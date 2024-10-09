@@ -25,7 +25,6 @@ class GenerateAndPopulate():
                 itemToRemoveDict = {list(l.keys())[0].strip('-'): list(l.values())[0]}
                 itemsToRemove.append(itemToRemoveDict)
                 possibleNextElements.remove(l)
-                # possibleNextElements.remove({list(l.keys())[0] : list(l.values())[0]})
 
             # if there is a vertical wall above or below and a horizontal wall left or right, force a corner wall
             if list(l.keys())[0] == 'h':
@@ -167,14 +166,15 @@ class GenerateAndPopulate():
                     element.new(elementType, material, orientation)
 
                     # make borders continuous
-                    """
-                    if blockX in list([Creation.blocksWidth-1, 0]):
-                        element.new('wall', material, 'v')
-                    if blockY in list([Creation.blocksHeight-1, 0]):
-                        element.new('wall', material, 'h')
-                    if blockX in list([Creation.blocksWidth-1, 0]) and blockY in list([Creation.blocksHeight-1, 0]):
-                        element.new('wall', material, 'c')
-                    """
+
+                    if Creation.continuousBorders:
+                        if blockX in list([Creation.blocksWidth-1, 0]):
+                            element.new('wall', material, 'v')
+                        if blockY in list([Creation.blocksHeight-1, 0]):
+                            element.new('wall', material, 'h')
+                        if blockX in list([Creation.blocksWidth-1, 0]) and blockY in list([Creation.blocksHeight-1, 0]):
+                            element.new('wall', material, 'c')
+
 
 
                     Logging.log(f"[{blockX},{blockY}, {elementType}]", '')

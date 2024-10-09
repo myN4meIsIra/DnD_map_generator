@@ -18,14 +18,14 @@ materials = {
 
 # divided by the number of orientations of that item that can be generated, then multiply by 10 so we don't have 0-weights
 weights = {
-    "wall": round((3 / 3) * 10),
+    "wall": round((4 / 3) * 10),
     "door": round((1 / 2) * 10),
     #'road': round((1 / 2) * 10),
     "tree": round((1 / 3) * 10),
     "floor": round((6 / 2) * 10),
 }
 
-chanceOfDecoration = 1/10
+chanceOfDecoration = 1/5
 decorationWeights = {
     'plant':5,
     'chest':1,

@@ -19,6 +19,7 @@ class Creation:
         self.imgHeight = None
         self.generationIterations = None
         self.material = None
+        self.continuousBorders = None
 
     # return RGB code for the selected material, with a randomization fuzzing
     def fuzzMaterialRGB(self, material):
