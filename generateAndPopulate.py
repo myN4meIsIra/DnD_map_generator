@@ -1,6 +1,8 @@
 # generate a map and populate it into a bmp... basically
 
 import random
+from threading import Thread
+import time
 
 from element import Element
 from building_rules import rules
@@ -184,8 +186,58 @@ class GenerateAndPopulate():
         return self.populateMap(Creation, img, pixels, blockMatrix)
 
 
+    """
+    # threading import Thread
+    #def first_function(first_argu, return_val):
+    #    print(first_argu)
+    #    return_val[0] = "Return Value from " + first_argu
+    
+    
+    return_val_from_1 = [None] * 1
+    return_val_from_2 = [None] * 1
+    
+    thread_1 = Thread(target=first_function, args=("Thread 1", return_val_from_1))
+    thread_2 = Thread(target=first_function, args=("Thread 2", return_val_from_2))
+    
+    thread_1.start()
+    thread_2.start()
+    
+    thread_1.join()
+    thread_2.join()
+    
+    print(return_val_from_1)
+    print(return_val_from_2)
+
+    """
+    def threadPopulationCalls(self, element, Creation, block):
+        elementType = element.getElementType()
+        material = element.getMaterial()
+        orientation = element.getOrientation()
+
+        # operation to perform
+        if elementType == 'wall':
+            filledArea = Creation.wall(material, orientation)
+
+        elif elementType == 'floor':
+            filledArea = Creation.floor(material)
+
+        elif elementType == 'door':
+            filledArea = Creation.door(material, orientation)
+
+        elif elementType == 'road':
+            filledArea = Creation.road(material, orientation)
+
+        elif elementType == 'tree':
+            filledArea = Creation.tree(orientation, material)
+
+        block = filledArea
+        return filledArea
+
+    # do the magic of actually populating that blockmatrix into a full-sized bitmap
     def populateMap(self, Creation, img, pixels, blockMatrix):
         Logging.say('\n\npopulating map')
+
+        populatedMatrix = [[None]*Creation.blocksHeight]*Creation.blocksWidth
 
         # translate blockMatrix into image
         for blockX in range(Creation.blocksWidth):
@@ -196,35 +248,30 @@ class GenerateAndPopulate():
 
                 # pull data from element at [blockX, blockY]
                 element = blockMatrix[blockX][blockY]
-                elementType = element.getElementType()
-                material = element.getMaterial()
-                orientation = element.getOrientation()
+                #thread = Thread(target=self.threadPopulationCalls, args=(element, Creation, populatedMatrix[blockX][blockY]))
+                #blockMatrix[blockX][blockY] = None
+                populatedMatrix[blockX][blockY] = self.threadPopulationCalls(element, Creation, populatedMatrix[blockX][blockY])
 
-                Logging.log(f"[{blockX},{blockY}, {elementType}]", '')
+                #thread.start()
+                #thread.join()
+                #print(f"blockMatrix[{blockX},{blockY}]={blockMatrix[blockX][blockY]}")
+                #print(f"populatedMatrix[{blockX},{blockY}]={populatedMatrix[blockX][blockY]}")
+                #blockMatrix[blockX][blockY] = self.threadPopulationCalls(element, Creation)
 
-                # operation to perform
-                if elementType == 'wall':
-                    filledArea = Creation.wall(material, orientation)
 
-                elif elementType == 'floor':
-                    filledArea = Creation.floor(material)
 
-                elif elementType == 'door':
-                    filledArea = Creation.door(material, orientation)
+        # translate the populated matrix into image
+        for x in range(Creation.blocksWidth):
+            for y in range(Creation.blocksHeight):
+                #print(f"-- blockMatrix[{blockX},{blockY}]={blockMatrix[blockX][blockY]}")
+                print(f"-- populatedMatrix[{x},{y}]={populatedMatrix[x][y]}")
 
-                elif elementType == 'road':
-                    filledArea = Creation.road(material, orientation)
-
-                elif elementType == 'tree':
-                    filledArea = Creation.tree(orientation, material)
-
-                # print(f'last element type {elementType}')
-
+                filledArea = populatedMatrix[x][y]
                 # transfer operated area into main image
                 for i in range(Creation.blockSize):
+                    print(f"-- filledArea = {filledArea}")
+
                     for j in range(Creation.blockSize):
-                        pixels[i + (blockX * Creation.blockSize), j + (blockY * Creation.blockSize)] = filledArea[i, j]
-                        # print(f'image[{i+(blockX*self.blockSize)},{j+(blockY*self.blockSize)}] <-- [{i},{j}]')
-                filledArea = None
+                        pixels[i + (x * Creation.blockSize), j + (y * Creation.blockSize)] = filledArea[i, j]
 
         return img
